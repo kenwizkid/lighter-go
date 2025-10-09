@@ -367,7 +367,7 @@ func (c *WsAccountMarketClient) handleSubscribedAccountMarket(message []byte) {
 // handleUpdateAccountMarket handles account market update messages
 func (c *WsAccountMarketClient) handleUpdateAccountMarket(message []byte) {
 	// Log raw message for debugging
-	log.Printf("AccountMarket raw update message: %s", string(message))
+	// log.Printf("AccountMarket raw update message: %s", string(message))
 
 	var update AccountMarketUpdate
 	if err := json.Unmarshal(message, &update); err != nil {
