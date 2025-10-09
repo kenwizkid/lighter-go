@@ -19,7 +19,12 @@ func isZeroByteSlice(bytes []byte) bool {
 	return true
 }
 
-func getTxInfo(tx interface{}) (string, error) {
+// TxSerializable is the interface for serializable transaction types
+type TxSerializable interface {
+	// This interface is implemented by all transaction types
+}
+
+func getTxInfo(tx TxSerializable) (string, error) {
 	txInfoBytes, err := json.Marshal(tx)
 	if err != nil {
 		return "", err
