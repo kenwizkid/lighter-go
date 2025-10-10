@@ -1,6 +1,9 @@
 package client
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 // Handler function types for WebSocket clients
 
@@ -159,19 +162,27 @@ type FundingHistory struct {
 	PositionSide string `json:"position_side"`
 }
 
-// Trade represents a trade record
 type Trade struct {
-	TradeID    int64  `json:"trade_id"`
-	OrderID    string `json:"order_id"`
-	MarketID   uint8  `json:"market_id"`
-	Symbol     string `json:"symbol"`
-	Side       string `json:"side"`
-	Price      string `json:"price"`
-	Quantity   string `json:"quantity"`
-	Fee        string `json:"fee"`
-	FeeAsset   string `json:"fee_asset"`
-	IsMaker    bool   `json:"is_maker"`
-	ExecutedAt int64  `json:"executed_at"`
+	AskAccountID                     int64       `json:"ask_account_id"`
+	AskID                            json.Number `json:"ask_id"`
+	BidAccountID                     int64       `json:"bid_account_id"`
+	BidID                            json.Number `json:"bid_id"`
+	BlockHeight                      json.Number `json:"block_height"`
+	IsMakerAsk                       bool        `json:"is_maker_ask"`
+	MakerEntryQuoteBefore            float64     `json:"maker_entry_quote_before"`
+	MakerInitialMarginFractionBefore float64     `json:"maker_initial_margin_fraction_before"`
+	MakerPositionSizeBefore          float64     `json:"maker_position_size_before"`
+	MarketID                         int64       `json:"market_id"`
+	Price                            float64     `json:"price"`
+	Size                             float64     `json:"size"`
+	TakerEntryQuoteBefore            float64     `json:"taker_entry_quote_before"`
+	TakerInitialMarginFractionBefore float64     `json:"taker_initial_margin_fraction_before"`
+	TakerPositionSizeBefore          float64     `json:"taker_position_size_before"`
+	Timestamp                        float64     `json:"timestamp"`
+	TradeID                          json.Number `json:"trade_id"`
+	TxHash                           string      `json:"tx_hash"`
+	Type                             string      `json:"type"`
+	UsdAmount                        float64     `json:"usd_amount"`
 }
 
 // AccountMarketUpdate represents an account market update message (matches API docs)
