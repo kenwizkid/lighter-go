@@ -169,20 +169,20 @@ type Trade struct {
 	BidID                            json.Number `json:"bid_id"`
 	BlockHeight                      json.Number `json:"block_height"`
 	IsMakerAsk                       bool        `json:"is_maker_ask"`
-	MakerEntryQuoteBefore            float64     `json:"maker_entry_quote_before"`
-	MakerInitialMarginFractionBefore float64     `json:"maker_initial_margin_fraction_before"`
-	MakerPositionSizeBefore          float64     `json:"maker_position_size_before"`
+	MakerEntryQuoteBefore            json.Number `json:"maker_entry_quote_before"`
+	MakerInitialMarginFractionBefore json.Number `json:"maker_initial_margin_fraction_before"`
+	MakerPositionSizeBefore          json.Number `json:"maker_position_size_before"`
 	MarketID                         int64       `json:"market_id"`
-	Price                            float64     `json:"price"`
-	Size                             float64     `json:"size"`
-	TakerEntryQuoteBefore            float64     `json:"taker_entry_quote_before"`
-	TakerInitialMarginFractionBefore float64     `json:"taker_initial_margin_fraction_before"`
-	TakerPositionSizeBefore          float64     `json:"taker_position_size_before"`
-	Timestamp                        float64     `json:"timestamp"`
+	Price                            json.Number `json:"price"`
+	Size                             json.Number `json:"size"`
+	TakerEntryQuoteBefore            json.Number `json:"taker_entry_quote_before"`
+	TakerInitialMarginFractionBefore json.Number `json:"taker_initial_margin_fraction_before"`
+	TakerPositionSizeBefore          json.Number `json:"taker_position_size_before"`
+	Timestamp                        json.Number `json:"timestamp"`
 	TradeID                          json.Number `json:"trade_id"`
 	TxHash                           string      `json:"tx_hash"`
 	Type                             string      `json:"type"`
-	UsdAmount                        float64     `json:"usd_amount"`
+	UsdAmount                        json.Number `json:"usd_amount"`
 }
 
 // AccountMarketUpdate represents an account market update message (matches API docs)
