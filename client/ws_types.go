@@ -161,7 +161,7 @@ type FundingHistory struct {
 
 // Trade represents a trade record
 type Trade struct {
-	TradeID    string `json:"trade_id"`
+	TradeID    int64  `json:"trade_id"`
 	OrderID    string `json:"order_id"`
 	MarketID   uint8  `json:"market_id"`
 	Symbol     string `json:"symbol"`
