@@ -71,7 +71,7 @@ type OrderBookUpdate struct {
 	OrderBook OrderBookData `json:"order_book"`
 }
 
-// Position represents a user's position
+// Position represents a websocket's position
 type Position struct {
 	Symbol        string `json:"symbol"`
 	MarketID      uint8  `json:"market_id"`

@@ -93,7 +93,7 @@ func (c *HTTPClient) getAndParseResponse(path string, params HTTPParams, result 
 	if err = c.parseResultStatus(body); err != nil {
 		return err
 	}
-	
+
 	if err := json.Unmarshal(body, result); err != nil {
 		return err
 	}
@@ -218,6 +218,15 @@ func (c *HTTPClient) GetTrades(params GetTradesParams) (*TradesResponse, error) 
 	return result, nil
 }
 
+func (c *HTTPClient) GetOrderBookOrders(marketIndex uint8, limit int64) (*OrderBookResponse, error) {
+	result := &OrderBookResponse{}
+	err := c.getAndParseL2HTTPResponse("api/v1/orderBookOrders", map[string]any{"market_id": marketIndex, "limit": limit}, result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 // =============================================================================
 // Transaction Methods
 // =============================================================================
@@ -277,16 +286,18 @@ type AccountResponse struct {
 type AccountInfo struct {
 	Code                    int            `json:"code"`
 	AccountType             int            `json:"account_type"`
-	AccountIndex            int64          `json:"index"`
 	L1Address               string         `json:"l1_address"`
 	CancelAllTime           int64          `json:"cancel_all_time"`
 	TotalOrderCount         int            `json:"total_order_count"`
 	TotalIsolatedOrderCount int            `json:"total_isolated_order_count"`
-	Balance                 string         `json:"balance"`
+	PendingOrderCount       int            `json:"pending_order_count"`
 	AvailableBalance        string         `json:"available_balance"`
-	MarginBalance           string         `json:"margin_balance"`
-	UnrealizedPnL           string         `json:"unrealized_pnl"`
-	RealizedPnL             string         `json:"realized_pnl"`
+	Status                  int            `json:"status"`
+	Collateral              string         `json:"collateral"`
+	AccountIndex            int64          `json:"account_index"`
+	CanInvite               bool           `json:"can_invite"`
+	TotalAssetValue         string         `json:"total_asset_value"`
+	CrossAssetValue         string         `json:"cross_asset_value"`
 	Positions               []PositionInfo `json:"positions"`
 	Orders                  []OrderInfo    `json:"orders"`
 }
@@ -377,4 +388,22 @@ type TradesResponse struct {
 	Message string      `json:"message"`
 	Trades  []TradeInfo `json:"trades"`
 	Total   int         `json:"total"`
+}
+
+type OrderLevel struct {
+	OrderIndex          int64  `json:"order_index"`
+	OrderID             string `json:"order_id"`
+	OwnerAccountIndex   int64  `json:"owner_account_index"`
+	InitialBaseAmount   string `json:"initial_base_amount"`
+	RemainingBaseAmount string `json:"remaining_base_amount"`
+	Price               string `json:"price"`
+	OrderExpiry         int64  `json:"order_expiry"`
+}
+
+type OrderBookResponse struct {
+	Code      int          `json:"code"`
+	TotalAsks int          `json:"total_asks"`
+	Asks      []OrderLevel `json:"asks"`
+	TotalBids int          `json:"total_bids"`
+	Bids      []OrderLevel `json:"bids"`
 }
