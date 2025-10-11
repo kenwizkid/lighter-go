@@ -140,7 +140,7 @@ type AccountMarketOrder struct {
 	OrderID          string `json:"order_id"`
 	ClientOrderID    string `json:"client_order_id"`
 	ClientOrderIndex int64  `json:"client_order_index"`
-	MarketID         uint8  `json:"market_id"`
+	MarketID         uint8  `json:"market_index"`
 	OrderType        string `json:"type"`
 	Price            string `json:"price"`
 	Quantity         string `json:"initial_base_amount"`
