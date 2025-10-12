@@ -32,7 +32,7 @@ type AccountMarketPositionUpdateHandler func(account int64, position *AccountMar
 type AccountMarketTradeUpdateHandler func(account int64, trades []Trade)
 
 // AccountMarketFundingUpdateHandler handles funding updates specifically
-type AccountMarketFundingUpdateHandler func(account int64, funding *FundingHistory)
+type AccountMarketFundingUpdateHandler func(account int64, funding []FundingHistory)
 
 // ErrorHandler handles error messages
 type ErrorHandler func(error *ErrorMessage)
