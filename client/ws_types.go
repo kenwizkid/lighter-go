@@ -190,7 +190,7 @@ type AccountMarketUpdate struct {
 	Account        int64                  `json:"account"`
 	Channel        string                 `json:"channel"`
 	Type           string                 `json:"type"`
-	FundingHistory *FundingHistory        `json:"funding_history,omitempty"`
+	FundingHistory []FundingHistory       `json:"funding_history,omitempty"`
 	Orders         []AccountMarketOrder   `json:"orders"`
 	Position       *AccountMarketPosition `json:"position,omitempty"`
 	Trades         []Trade                `json:"trades"`
@@ -202,7 +202,7 @@ type AccountMarketSnapshot struct {
 	Account        int64                  `json:"account"`
 	Channel        string                 `json:"channel"`
 	Type           string                 `json:"type"`
-	FundingHistory *FundingHistory        `json:"funding_history,omitempty"`
+	FundingHistory *[]FundingHistory      `json:"funding_history,omitempty"`
 	Orders         []AccountMarketOrder   `json:"orders"`
 	Position       *AccountMarketPosition `json:"position,omitempty"`
 	Trades         []Trade                `json:"trades"`
