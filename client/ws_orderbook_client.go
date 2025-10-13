@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"net/url"
 	"strings"
 	"sync"
@@ -15,20 +16,21 @@ import (
 
 // WsOrderBookClient is a WebSocket client dedicated to order book subscriptions
 type WsOrderBookClient struct {
-	baseURL               string
-	conn                  *websocket.Conn
-	marketIDs             []uint8
-	onOrderBookUpdate     OrderBookUpdateHandler
-	onOrderBookSnapshot   OrderBookSnapshotHandler
-	onMessage             MessageHandler
-	onError               ErrorHandler
-	mu                    sync.RWMutex
-	ctx                   context.Context
-	cancel                context.CancelFunc
-	reconnectInterval     time.Duration
-	maxReconnectAttempts  int
-	isConnected           bool
-	done                  chan struct{}
+	baseURL              string
+	conn                 *websocket.Conn
+	marketIDs            []uint8
+	onOrderBookUpdate    OrderBookUpdateHandler
+	onOrderBookSnapshot  OrderBookSnapshotHandler
+	onMessage            MessageHandler
+	onError              ErrorHandler
+	localAddr            net.Addr // Local address for outgoing connections
+	mu                   sync.RWMutex
+	ctx                  context.Context
+	cancel               context.CancelFunc
+	reconnectInterval    time.Duration
+	maxReconnectAttempts int
+	isConnected          bool
+	done                 chan struct{}
 }
 
 // NewWsOrderBookClient creates a new dedicated order book WebSocket client
@@ -103,6 +105,28 @@ func WithOrderBookReconnectInterval(interval time.Duration) WsOrderBookClientOpt
 	}
 }
 
+// WithOrderBookLocalIP sets the local IP address for outgoing connections
+func WithOrderBookLocalIP(localIP string) WsOrderBookClientOption {
+	return func(c *WsOrderBookClient) {
+		if localIP != "" {
+			if ip := net.ParseIP(localIP); ip != nil {
+				c.localAddr = &net.TCPAddr{IP: ip, Port: 0}
+			}
+		}
+	}
+}
+
+// WithOrderBookLocalAddress sets the local address for outgoing connections
+func WithOrderBookLocalAddress(localAddr string) WsOrderBookClientOption {
+	return func(c *WsOrderBookClient) {
+		if localAddr != "" {
+			if addr, err := net.ResolveTCPAddr("tcp", localAddr+":0"); err == nil {
+				c.localAddr = addr
+			}
+		}
+	}
+}
+
 // Connect establishes a WebSocket connection
 func (c *WsOrderBookClient) connect() error {
 	u, err := url.Parse(c.baseURL)
@@ -110,7 +134,22 @@ func (c *WsOrderBookClient) connect() error {
 		return fmt.Errorf("invalid WebSocket URL: %v", err)
 	}
 
-	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	// Create dialer with local address if specified
+	dialer := websocket.DefaultDialer
+	if c.localAddr != nil {
+		dialer = &websocket.Dialer{
+			NetDialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+				d := &net.Dialer{
+					LocalAddr: c.localAddr,
+					Timeout:   dialer.HandshakeTimeout,
+				}
+				return d.DialContext(ctx, network, addr)
+			},
+			HandshakeTimeout: dialer.HandshakeTimeout,
+		}
+	}
+
+	conn, _, err := dialer.Dial(u.String(), nil)
 	if err != nil {
 		return fmt.Errorf("failed to connect to WebSocket: %v", err)
 	}
@@ -269,7 +308,7 @@ func (c *WsOrderBookClient) processMessage(message []byte) {
 // handleConnected subscribes ONLY to order books
 func (c *WsOrderBookClient) handleConnected() {
 	log.Println("OrderBook client connected, subscribing to order books only")
-	
+
 	time.Sleep(100 * time.Millisecond)
 
 	// Subscribe ONLY to order books
@@ -330,7 +369,7 @@ func (c *WsOrderBookClient) handleError(message []byte) {
 	}
 
 	log.Printf("OrderBook error: Code=%d, Message=%s", errorMsg.Code, errorMsg.Message)
-	
+
 	if c.onError != nil {
 		c.onError(&errorMsg)
 	}
@@ -364,7 +403,7 @@ func (c *WsOrderBookClient) sendMessage(message interface{}) error {
 	if err != nil {
 		return fmt.Errorf("OrderBook failed to marshal message: %v", err)
 	}
-	
+
 	log.Printf("OrderBook sending message: %s", string(data))
 	return c.conn.WriteMessage(websocket.TextMessage, data)
 }

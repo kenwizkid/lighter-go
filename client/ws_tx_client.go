@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"net/url"
 	"strings"
 	"sync"
@@ -42,19 +43,20 @@ type BatchTxResponse struct {
 
 // WsTxClient is a WebSocket client dedicated to sending transactions
 type WsTxClient struct {
-	baseURL               string
-	conn                  *websocket.Conn
-	onTxResponse          TxResponseHandler
-	onBatchTxResponse     BatchTxResponseHandler
-	onMessage             MessageHandler
-	onError               ErrorHandler
-	mu                    sync.RWMutex
-	ctx                   context.Context
-	cancel                context.CancelFunc
-	reconnectInterval     time.Duration
-	maxReconnectAttempts  int
-	isConnected           bool
-	done                  chan struct{}
+	baseURL              string
+	conn                 *websocket.Conn
+	onTxResponse         TxResponseHandler
+	onBatchTxResponse    BatchTxResponseHandler
+	onMessage            MessageHandler
+	onError              ErrorHandler
+	localAddr            net.Addr // Local address for outgoing connections
+	mu                   sync.RWMutex
+	ctx                  context.Context
+	cancel               context.CancelFunc
+	reconnectInterval    time.Duration
+	maxReconnectAttempts int
+	isConnected          bool
+	done                 chan struct{}
 }
 
 // NewWsTxClient creates a new dedicated transaction WebSocket client
@@ -124,6 +126,28 @@ func WithTxWsReconnectInterval(interval time.Duration) WsTxClientOption {
 	}
 }
 
+// WithTxWsLocalIP sets the local IP address for outgoing connections
+func WithTxWsLocalIP(localIP string) WsTxClientOption {
+	return func(c *WsTxClient) {
+		if localIP != "" {
+			if ip := net.ParseIP(localIP); ip != nil {
+				c.localAddr = &net.TCPAddr{IP: ip, Port: 0}
+			}
+		}
+	}
+}
+
+// WithTxWsLocalAddress sets the local address for outgoing connections
+func WithTxWsLocalAddress(localAddr string) WsTxClientOption {
+	return func(c *WsTxClient) {
+		if localAddr != "" {
+			if addr, err := net.ResolveTCPAddr("tcp", localAddr+":0"); err == nil {
+				c.localAddr = addr
+			}
+		}
+	}
+}
+
 // Connect establishes a WebSocket connection
 func (c *WsTxClient) connect() error {
 	u, err := url.Parse(c.baseURL)
@@ -131,7 +155,22 @@ func (c *WsTxClient) connect() error {
 		return fmt.Errorf("invalid WebSocket URL: %v", err)
 	}
 
-	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	// Create dialer with local address if specified
+	dialer := websocket.DefaultDialer
+	if c.localAddr != nil {
+		dialer = &websocket.Dialer{
+			NetDialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+				d := &net.Dialer{
+					LocalAddr: c.localAddr,
+					Timeout:   dialer.HandshakeTimeout,
+				}
+				return d.DialContext(ctx, network, addr)
+			},
+			HandshakeTimeout: dialer.HandshakeTimeout,
+		}
+	}
+
+	conn, _, err := dialer.Dial(u.String(), nil)
 	if err != nil {
 		return fmt.Errorf("failed to connect to WebSocket: %v", err)
 	}
@@ -216,9 +255,9 @@ func (c *WsTxClient) SendTransaction(signedTx string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("TxWs failed to marshal transaction message: %v", err)
 	}
-	
+
 	log.Printf("TxWs sending transaction: %s", string(data))
-	
+
 	if err := c.conn.WriteMessage(websocket.TextMessage, data); err != nil {
 		return "", fmt.Errorf("TxWs failed to send transaction: %v", err)
 	}
@@ -247,9 +286,9 @@ func (c *WsTxClient) SendBatchTransactions(signedTxs []string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("TxWs failed to marshal batch transaction message: %v", err)
 	}
-	
+
 	log.Printf("TxWs sending batch transactions: %s", string(data))
-	
+
 	if err := c.conn.WriteMessage(websocket.TextMessage, data); err != nil {
 		return "", fmt.Errorf("TxWs failed to send batch transactions: %v", err)
 	}
@@ -373,11 +412,11 @@ func (c *WsTxClient) handleTxResponse(message []byte) {
 	var msg struct {
 		Type string `json:"type"`
 		Data struct {
-			ID       string                 `json:"id"`
-			Status   string                 `json:"status"`
-			TxHash   string                 `json:"tx_hash,omitempty"`
-			Error    string                 `json:"error,omitempty"`
-			Data     map[string]interface{} `json:"data,omitempty"`
+			ID     string                 `json:"id"`
+			Status string                 `json:"status"`
+			TxHash string                 `json:"tx_hash,omitempty"`
+			Error  string                 `json:"error,omitempty"`
+			Data   map[string]interface{} `json:"data,omitempty"`
 		} `json:"data"`
 	}
 
@@ -441,7 +480,7 @@ func (c *WsTxClient) handleError(message []byte) {
 	}
 
 	log.Printf("TxWs error: Code=%d, Message=%s", errorMsg.Code, errorMsg.Message)
-	
+
 	if c.onError != nil {
 		c.onError(&errorMsg)
 	}
@@ -475,6 +514,6 @@ func (c *WsTxClient) sendMessage(message interface{}) error {
 	if err != nil {
 		return fmt.Errorf("TxWs failed to marshal message: %v", err)
 	}
-	
+
 	return c.conn.WriteMessage(websocket.TextMessage, data)
 }

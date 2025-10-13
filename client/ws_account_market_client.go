@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"net/url"
 	"strings"
 	"sync"
@@ -27,6 +28,7 @@ type WsAccountMarketClient struct {
 	onMessage               MessageHandler
 	onError                 ErrorHandler
 	txClient                *TxClient // For generating auth tokens
+	localAddr               net.Addr  // Local address for outgoing connections
 	mu                      sync.RWMutex
 	ctx                     context.Context
 	cancel                  context.CancelFunc
@@ -143,6 +145,28 @@ func WithAccountMarketFundingUpdateHandler(handler AccountMarketFundingUpdateHan
 	}
 }
 
+// WithAccountMarketLocalIP sets the local IP address for outgoing connections
+func WithAccountMarketLocalIP(localIP string) WsAccountMarketClientOption {
+	return func(c *WsAccountMarketClient) {
+		if localIP != "" {
+			if ip := net.ParseIP(localIP); ip != nil {
+				c.localAddr = &net.TCPAddr{IP: ip, Port: 0}
+			}
+		}
+	}
+}
+
+// WithAccountMarketLocalAddress sets the local address for outgoing connections
+func WithAccountMarketLocalAddress(localAddr string) WsAccountMarketClientOption {
+	return func(c *WsAccountMarketClient) {
+		if localAddr != "" {
+			if addr, err := net.ResolveTCPAddr("tcp", localAddr+":0"); err == nil {
+				c.localAddr = addr
+			}
+		}
+	}
+}
+
 // Connect establishes a WebSocket connection
 func (c *WsAccountMarketClient) connect() error {
 	u, err := url.Parse(c.baseURL)
@@ -150,7 +174,22 @@ func (c *WsAccountMarketClient) connect() error {
 		return fmt.Errorf("invalid WebSocket URL: %v", err)
 	}
 
-	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	// Create dialer with local address if specified
+	dialer := websocket.DefaultDialer
+	if c.localAddr != nil {
+		dialer = &websocket.Dialer{
+			NetDialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+				d := &net.Dialer{
+					LocalAddr: c.localAddr,
+					Timeout:   dialer.HandshakeTimeout,
+				}
+				return d.DialContext(ctx, network, addr)
+			},
+			HandshakeTimeout: dialer.HandshakeTimeout,
+		}
+	}
+
+	conn, _, err := dialer.Dial(u.String(), nil)
 	if err != nil {
 		return fmt.Errorf("failed to connect to WebSocket: %v", err)
 	}
