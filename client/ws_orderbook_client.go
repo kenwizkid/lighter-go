@@ -182,7 +182,10 @@ func (c *WsOrderBookClient) Run() error {
 		}
 
 		// Reset attempt counter on successful connection
-		attempt = 0
+		// If maxReconnectAttempts is 1, means no need reconnection by sdk auto
+		if c.maxReconnectAttempts > 1 {
+			attempt = 0
+		}
 
 		// Handle messages
 		if err := c.handleMessages(); err != nil {
