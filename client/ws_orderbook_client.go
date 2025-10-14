@@ -105,6 +105,13 @@ func WithOrderBookReconnectInterval(interval time.Duration) WsOrderBookClientOpt
 	}
 }
 
+// WithOrderBookMaxReconnectAttempts sets the maxReconnectAttempts
+func WithOrderBookMaxReconnectAttempts(maxAttempts int) WsOrderBookClientOption {
+	return func(c *WsOrderBookClient) {
+		c.maxReconnectAttempts = maxAttempts
+	}
+}
+
 // WithOrderBookLocalIP sets the local IP address for outgoing connections
 func WithOrderBookLocalIP(localIP string) WsOrderBookClientOption {
 	return func(c *WsOrderBookClient) {
