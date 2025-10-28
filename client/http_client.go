@@ -1,7 +1,6 @@
 package client
 
 import (
-	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
@@ -87,7 +86,7 @@ func (c *HTTPClient) setupHTTPClient() {
 		MaxConnsPerHost:     1000,
 		MaxIdleConnsPerHost: 100,
 		IdleConnTimeout:     10 * time.Second,
-		TLSClientConfig:     &tls.Config{InsecureSkipVerify: true},
+		//TLSClientConfig:     &tls.Config{InsecureSkipVerify: true},
 	}
 
 	c.client = &http.Client{
