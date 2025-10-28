@@ -2,6 +2,7 @@ package client
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net"
 	"net/http"
 	"time"
@@ -71,7 +72,10 @@ func (c *HTTPClient) setupHTTPClient() {
 
 	// 如果指定了本地地址，设置到 dialer
 	if c.localAddr != nil {
+		fmt.Println("has local address")
 		dialer.LocalAddr = c.localAddr
+	} else {
+		fmt.Println("no local address")
 	}
 
 	transport := &http.Transport{
