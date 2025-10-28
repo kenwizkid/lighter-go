@@ -65,17 +65,21 @@ func NewHTTPClient(baseUrl string, opts ...HTTPClientOption) *HTTPClient {
 
 // setupHTTPClient 根据配置创建 HTTP 客户端
 func (c *HTTPClient) setupHTTPClient() {
-	dialer := &net.Dialer{
-		Timeout:   10 * time.Second,
-		KeepAlive: 60 * time.Second,
-	}
 
-	// 如果指定了本地地址，设置到 dialer
+	var dialer *net.Dialer
+
 	if c.localAddr != nil {
 		fmt.Println("has local address")
-		dialer.LocalAddr = c.localAddr
+		dialer = &net.Dialer{
+			Timeout:   10 * time.Second,
+			KeepAlive: 60 * time.Second,
+			LocalAddr: c.localAddr,
+		}
 	} else {
-		fmt.Println("no local address")
+		dialer = &net.Dialer{
+			Timeout:   10 * time.Second,
+			KeepAlive: 60 * time.Second,
+		}
 	}
 
 	transport := &http.Transport{
