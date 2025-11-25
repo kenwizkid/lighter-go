@@ -99,7 +99,7 @@ type BurnSharesTxReq struct {
 type UpdateLeverageTxReq struct {
 	MarketIndex           uint8
 	InitialMarginFraction uint16
-	MarginMode            uint8
+	MarginMode            *uint8
 }
 
 type UpdateMarginTxReq struct {
@@ -636,13 +636,16 @@ func ConvertBurnSharesTx(tx *BurnSharesTxReq, ops *TransactOpts) *txtypes.L2Burn
 }
 
 func ConvertUpdateLeverageTx(tx *UpdateLeverageTxReq, ops *TransactOpts) *txtypes.L2UpdateLeverageTxInfo {
-	return &txtypes.L2UpdateLeverageTxInfo{
+	info := txtypes.L2UpdateLeverageTxInfo{
 		AccountIndex:          *ops.FromAccountIndex,
 		ApiKeyIndex:           *ops.ApiKeyIndex,
 		MarketIndex:           tx.MarketIndex,
 		InitialMarginFraction: tx.InitialMarginFraction,
 		ExpiredAt:             ops.ExpiredAt,
 		Nonce:                 *ops.Nonce,
+	}
+	if tx.MarginMode != nil {
+		info.MarginMode = *tx.MarginMode
 	}
 }
 
