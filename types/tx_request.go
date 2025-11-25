@@ -647,6 +647,7 @@ func ConvertUpdateLeverageTx(tx *UpdateLeverageTxReq, ops *TransactOpts) *txtype
 	if tx.MarginMode != nil {
 		info.MarginMode = *tx.MarginMode
 	}
+	return &info
 }
 
 func ConvertUpdateMarginTx(tx *UpdateMarginTxReq, ops *TransactOpts) *txtypes.L2UpdateMarginTxInfo {
