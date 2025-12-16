@@ -103,7 +103,7 @@ func NewAccountMarketUnsubscription(accountID int, marketID uint16) UnsubscribeM
 func extractMarketID(channel string) uint16 {
 	parts := strings.Split(channel, ":")
 	if len(parts) >= 2 {
-		id, err := strconv.ParseUint(parts[1], 10, 8)
+		id, err := strconv.ParseUint(parts[1], 10, 16)
 		if err == nil {
 			return uint16(id)
 		}
@@ -112,7 +112,7 @@ func extractMarketID(channel string) uint16 {
 	// Try with forward slash
 	parts = strings.Split(channel, "/")
 	if len(parts) >= 2 {
-		id, err := strconv.ParseUint(parts[1], 10, 8)
+		id, err := strconv.ParseUint(parts[1], 10, 16)
 		if err == nil {
 			return uint16(id)
 		}
@@ -126,7 +126,7 @@ func extractMarketID(channel string) uint16 {
 func extractAccountMarketIDs(channel string) (accountID int, marketID uint16) {
 	parts := strings.Split(channel, "/")
 	if len(parts) >= 3 {
-		mid, err1 := strconv.ParseUint(parts[1], 10, 8)
+		mid, err1 := strconv.ParseUint(parts[1], 10, 16)
 		aid, err2 := strconv.Atoi(parts[2])
 		if err1 == nil && err2 == nil {
 			return aid, uint16(mid)
