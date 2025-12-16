@@ -341,6 +341,7 @@ func (c *WsOrderBookClient) handleSubscribedOrderBook(message []byte) {
 
 	marketID := extractMarketID(snapshot.Channel)
 	if marketID == 65535 {
+		log.Printf("OrderBook snapshot is: %+v", snapshot)
 		log.Printf("OrderBook failed to extract market ID from channel: %s", snapshot.Channel)
 		return
 	}
@@ -361,6 +362,7 @@ func (c *WsOrderBookClient) handleUpdateOrderBook(message []byte) {
 
 	marketID := extractMarketID(update.Channel)
 	if marketID == 65535 {
+		log.Printf("OrderBook update is: %+v", update)
 		log.Printf("OrderBook failed to extract market ID from channel: %s", update.Channel)
 		return
 	}
