@@ -11,10 +11,10 @@ import (
 type MessageHandler func(messageType string, rawData []byte)
 
 // OrderBookUpdateHandler handles order book updates
-type OrderBookUpdateHandler func(marketID uint8, update *OrderBookUpdate)
+type OrderBookUpdateHandler func(marketID uint16, update *OrderBookUpdate)
 
 // OrderBookSnapshotHandler handles order book snapshots
-type OrderBookSnapshotHandler func(marketID uint8, snapshot *OrderBookSnapshot)
+type OrderBookSnapshotHandler func(marketID uint16, snapshot *OrderBookSnapshot)
 
 // AccountMarketUpdateHandler handles account market updates
 type AccountMarketUpdateHandler func(update *AccountMarketUpdate)
@@ -40,7 +40,7 @@ type ErrorHandler func(error *ErrorMessage)
 // AccountMarketSub represents an account-market pair to subscribe to
 type AccountMarketSub struct {
 	AccountIndex int64
-	MarketID     uint8
+	MarketID     uint16
 	AuthToken    string    // Optional auth token for authentication (deprecated - use TxClient instead)
 	TxClient     *TxClient // Optional TxClient for generating auth tokens
 }
@@ -77,7 +77,7 @@ type OrderBookUpdate struct {
 // Position represents a websocket's position
 type Position struct {
 	Symbol        string `json:"symbol"`
-	MarketID      uint8  `json:"market_id"`
+	MarketID      uint16 `json:"market_id"`
 	Side          string `json:"side"`
 	Quantity      string `json:"quantity"`
 	EntryPrice    string `json:"entry_price"`
@@ -91,7 +91,7 @@ type Order struct {
 	OrderID        string    `json:"order_id"`
 	ClientOrderID  string    `json:"client_order_id"`
 	Symbol         string    `json:"symbol"`
-	MarketID       uint8     `json:"market_id"`
+	MarketID       uint16    `json:"market_id"`
 	Side           string    `json:"side"`
 	OrderType      string    `json:"order_type"`
 	Price          string    `json:"price"`
@@ -117,7 +117,7 @@ type AccountData struct {
 
 // AccountMarketPosition represents position data for a specific market
 type AccountMarketPosition struct {
-	MarketID               uint8  `json:"market_id"`
+	MarketID               uint16 `json:"market_id"`
 	Symbol                 string `json:"symbol"`
 	InitialMarginFraction  string `json:"initial_margin_fraction"`
 	OpenOrderCount         int    `json:"open_order_count"`
@@ -140,7 +140,7 @@ type AccountMarketOrder struct {
 	OrderID          string `json:"order_id"`
 	ClientOrderID    string `json:"client_order_id"`
 	ClientOrderIndex int64  `json:"client_order_index"`
-	MarketID         uint8  `json:"market_index"`
+	MarketID         uint16 `json:"market_index"`
 	OrderType        string `json:"type"`
 	Price            string `json:"price"`
 	Quantity         string `json:"initial_base_amount"`
@@ -154,7 +154,7 @@ type AccountMarketOrder struct {
 // FundingHistory represents funding fee history data
 type FundingHistory struct {
 	Timestamp    int64  `json:"timestamp"`
-	MarketID     int64  `json:"market_id"`
+	MarketID     uint16 `json:"market_id"`
 	FundingID    int64  `json:"funding_id"`
 	Change       string `json:"change"`
 	Rate         string `json:"rate"`
@@ -172,7 +172,7 @@ type Trade struct {
 	MakerEntryQuoteBefore            json.Number `json:"maker_entry_quote_before"`
 	MakerInitialMarginFractionBefore json.Number `json:"maker_initial_margin_fraction_before"`
 	MakerPositionSizeBefore          json.Number `json:"maker_position_size_before"`
-	MarketID                         int64       `json:"market_id"`
+	MarketID                         uint16      `json:"market_id"`
 	Price                            json.Number `json:"price"`
 	Size                             json.Number `json:"size"`
 	TakerEntryQuoteBefore            json.Number `json:"taker_entry_quote_before"`
@@ -211,7 +211,7 @@ type AccountMarketSnapshot struct {
 // Legacy AccountMarketData - kept for backward compatibility
 type AccountMarketData struct {
 	AccountIndex     int64                  `json:"account_id"`
-	MarketID         uint8                  `json:"market_id"`
+	MarketID         uint16                 `json:"market_id"`
 	Balance          string                 `json:"balance"`
 	AvailableBalance string                 `json:"available_balance"`
 	MarginBalance    string                 `json:"margin_balance"`

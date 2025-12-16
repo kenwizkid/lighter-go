@@ -18,7 +18,7 @@ import (
 type WsOrderBookClient struct {
 	baseURL              string
 	conn                 *websocket.Conn
-	marketIDs            []uint8
+	marketIDs            []uint16
 	onOrderBookUpdate    OrderBookUpdateHandler
 	onOrderBookSnapshot  OrderBookSnapshotHandler
 	onMessage            MessageHandler
@@ -34,7 +34,7 @@ type WsOrderBookClient struct {
 }
 
 // NewWsOrderBookClient creates a new dedicated order book WebSocket client
-func NewWsOrderBookClient(marketIDs []uint8, options ...WsOrderBookClientOption) (*WsOrderBookClient, error) {
+func NewWsOrderBookClient(marketIDs []uint16, options ...WsOrderBookClientOption) (*WsOrderBookClient, error) {
 	if len(marketIDs) == 0 {
 		return nil, fmt.Errorf("no market IDs provided for order book subscription")
 	}
@@ -340,7 +340,7 @@ func (c *WsOrderBookClient) handleSubscribedOrderBook(message []byte) {
 	}
 
 	marketID := extractMarketID(snapshot.Channel)
-	if marketID == 255 {
+	if marketID == 65535 {
 		log.Printf("OrderBook failed to extract market ID from channel: %s", snapshot.Channel)
 		return
 	}
@@ -360,7 +360,7 @@ func (c *WsOrderBookClient) handleUpdateOrderBook(message []byte) {
 	}
 
 	marketID := extractMarketID(update.Channel)
-	if marketID == 255 {
+	if marketID == 65535 {
 		log.Printf("OrderBook failed to extract market ID from channel: %s", update.Channel)
 		return
 	}

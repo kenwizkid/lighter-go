@@ -40,12 +40,12 @@ func (p GetAccountParams) ToMap() map[string]string {
 
 // GetOrdersParams represents parameters for GetOrders request
 type GetOrdersParams struct {
-	AccountIndex int64  `json:"account_index"`
-	MarketID     *uint8 `json:"market_id,omitempty"`
-	Status       string `json:"status,omitempty"`
-	Limit        int    `json:"limit,omitempty"`
-	Offset       int    `json:"offset,omitempty"`
-	Auth         string `json:"auth,omitempty"`
+	AccountIndex int64   `json:"account_index"`
+	MarketID     *uint16 `json:"market_id,omitempty"`
+	Status       string  `json:"status,omitempty"`
+	Limit        int     `json:"limit,omitempty"`
+	Offset       int     `json:"offset,omitempty"`
+	Auth         string  `json:"auth,omitempty"`
 }
 
 func (p GetOrdersParams) ToMap() map[string]string {
@@ -72,13 +72,13 @@ func (p GetOrdersParams) ToMap() map[string]string {
 
 // GetTradesParams represents parameters for GetTrades request
 type GetTradesParams struct {
-	AccountIndex int64  `json:"account_index"`
-	MarketID     *uint8 `json:"market_id,omitempty"`
-	StartTime    *int64 `json:"start_time,omitempty"`
-	EndTime      *int64 `json:"end_time,omitempty"`
-	Limit        int    `json:"limit,omitempty"`
-	Offset       int    `json:"offset,omitempty"`
-	Auth         string `json:"auth,omitempty"`
+	AccountIndex int64   `json:"account_index"`
+	MarketID     *uint16 `json:"market_id,omitempty"`
+	StartTime    *int64  `json:"start_time,omitempty"`
+	EndTime      *int64  `json:"end_time,omitempty"`
+	Limit        int     `json:"limit,omitempty"`
+	Offset       int     `json:"offset,omitempty"`
+	Auth         string  `json:"auth,omitempty"`
 }
 
 func (p GetTradesParams) ToMap() map[string]string {

@@ -218,7 +218,7 @@ func (c *HTTPClient) GetTrades(params GetTradesParams) (*TradesResponse, error) 
 	return result, nil
 }
 
-func (c *HTTPClient) GetOrderBookOrders(marketIndex uint8, limit int64) (*OrderBookResponse, error) {
+func (c *HTTPClient) GetOrderBookOrders(marketIndex uint16, limit int64) (*OrderBookResponse, error) {
 	result := &OrderBookResponse{}
 	err := c.getAndParseL2HTTPResponse("api/v1/orderBookOrders", map[string]any{"market_id": marketIndex, "limit": limit}, result)
 	if err != nil {
@@ -304,7 +304,7 @@ type AccountInfo struct {
 
 // PositionInfo represents position information
 type PositionInfo struct {
-	MarketID               uint8  `json:"market_id"`
+	MarketID               uint16 `json:"market_id"`
 	Symbol                 string `json:"symbol"`
 	InitialMarginFraction  string `json:"initial_margin_fraction"`
 	OpenOrderCount         int    `json:"open_order_count"`
@@ -328,7 +328,7 @@ type OrderInfo struct {
 	ClientOrderIndex    int64  `json:"client_order_index"`
 	OrderID             string `json:"order_id"`
 	ClientOrderID       string `json:"client_order_id"`
-	MarketIndex         uint8  `json:"market_index"`
+	MarketIndex         uint16 `json:"market_index"`
 	OwnerAccountIndex   int64  `json:"owner_account_index"`
 	InitialBaseAmount   string `json:"initial_base_amount"`
 	Price               string `json:"price"`
@@ -363,7 +363,7 @@ type OrderInfo struct {
 type TradeInfo struct {
 	TradeID    string `json:"trade_id"`
 	OrderID    string `json:"order_id"`
-	MarketID   uint8  `json:"market_id"`
+	MarketID   uint16 `json:"market_id"`
 	Symbol     string `json:"symbol"`
 	Side       string `json:"side"`
 	Price      string `json:"price"`

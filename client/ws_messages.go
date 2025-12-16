@@ -54,7 +54,7 @@ func (m PongMessage) GetType() string {
 // Helper functions to create messages
 
 // NewOrderBookSubscription creates a subscription message for an order book
-func NewOrderBookSubscription(marketID uint8) SubscribeMessage {
+func NewOrderBookSubscription(marketID uint16) SubscribeMessage {
 	return SubscribeMessage{
 		Type:    "subscribe",
 		Channel: fmt.Sprintf("order_book/%d", marketID),
@@ -73,7 +73,7 @@ func (m AccountMarketSubscription) GetType() string {
 }
 
 // NewAccountMarketSubscription creates a subscription message for an account on a specific market
-func NewAccountMarketSubscription(accountIndex int64, marketID uint8, authToken string) AccountMarketSubscription {
+func NewAccountMarketSubscription(accountIndex int64, marketID uint16, authToken string) AccountMarketSubscription {
 	return AccountMarketSubscription{
 		Type:    "subscribe",
 		Channel: fmt.Sprintf("account_market/%d/%d", marketID, accountIndex),
@@ -82,7 +82,7 @@ func NewAccountMarketSubscription(accountIndex int64, marketID uint8, authToken 
 }
 
 // NewOrderBookUnsubscription creates an unsubscription message for an order book
-func NewOrderBookUnsubscription(marketID uint8) UnsubscribeMessage {
+func NewOrderBookUnsubscription(marketID uint16) UnsubscribeMessage {
 	return UnsubscribeMessage{
 		Type:    "unsubscribe",
 		Channel: fmt.Sprintf("order_book/%d", marketID),
@@ -90,7 +90,7 @@ func NewOrderBookUnsubscription(marketID uint8) UnsubscribeMessage {
 }
 
 // NewAccountMarketUnsubscription creates an unsubscription message for an account market
-func NewAccountMarketUnsubscription(accountID int, marketID uint8) UnsubscribeMessage {
+func NewAccountMarketUnsubscription(accountID int, marketID uint16) UnsubscribeMessage {
 	return UnsubscribeMessage{
 		Type:    "unsubscribe",
 		Channel: fmt.Sprintf("account_market/%d/%d", marketID, accountID),
@@ -100,37 +100,37 @@ func NewAccountMarketUnsubscription(accountID int, marketID uint8) UnsubscribeMe
 // Helper functions
 
 // extractMarketID extracts the market ID from a channel string
-func extractMarketID(channel string) uint8 {
+func extractMarketID(channel string) uint16 {
 	parts := strings.Split(channel, ":")
 	if len(parts) >= 2 {
 		id, err := strconv.ParseUint(parts[1], 10, 8)
 		if err == nil {
-			return uint8(id)
+			return uint16(id)
 		}
 	}
-	
+
 	// Try with forward slash
 	parts = strings.Split(channel, "/")
 	if len(parts) >= 2 {
 		id, err := strconv.ParseUint(parts[1], 10, 8)
 		if err == nil {
-			return uint8(id)
+			return uint16(id)
 		}
 	}
-	
-	return 255 // Invalid market ID (max uint8 + 1)
+
+	return 65535 // Invalid market ID (max uint16 + 1)
 }
 
 // extractAccountMarketIDs extracts both account ID and market ID from a channel string
 // Format: "account_market/<market_id>/<account_id>"
-func extractAccountMarketIDs(channel string) (accountID int, marketID uint8) {
+func extractAccountMarketIDs(channel string) (accountID int, marketID uint16) {
 	parts := strings.Split(channel, "/")
 	if len(parts) >= 3 {
 		mid, err1 := strconv.ParseUint(parts[1], 10, 8)
 		aid, err2 := strconv.Atoi(parts[2])
 		if err1 == nil && err2 == nil {
-			return aid, uint8(mid)
+			return aid, uint16(mid)
 		}
 	}
-	return -1, 255
+	return -1, 65535
 }
