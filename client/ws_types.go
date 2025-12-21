@@ -25,6 +25,9 @@ type AccountMarketSnapshotHandler func(snapshot *AccountMarketSnapshot)
 // AccountMarketOrderUpdateHandler handles order updates specifically
 type AccountMarketOrderUpdateHandler func(account int64, orders []AccountMarketOrder)
 
+// AccountAssetUpdateHandler handles asset updates specifically
+type AccountAssetUpdateHandler func(account int64, assets []Asset)
+
 // AccountMarketPositionUpdateHandler handles position updates specifically
 type AccountMarketPositionUpdateHandler func(account int64, position *AccountMarketPosition)
 
@@ -199,7 +202,7 @@ type AccountMarketUpdate struct {
 	FundingHistory []FundingHistory       `json:"funding_history,omitempty"`
 	Orders         []AccountMarketOrder   `json:"orders"`
 	Position       *AccountMarketPosition `json:"position,omitempty"`
-	Assets         []Asset                `json:"assets,omitempty"`
+	Assets         map[string]Asset       `json:"assets,omitempty"`
 	Trades         []Trade                `json:"trades"`
 }
 

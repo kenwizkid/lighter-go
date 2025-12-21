@@ -25,6 +25,7 @@ type WsAccountMarketClient struct {
 	onPositionUpdate        AccountMarketPositionUpdateHandler
 	onTradeUpdate           AccountMarketTradeUpdateHandler
 	onFundingUpdate         AccountMarketFundingUpdateHandler
+	onAssetUpdate           AccountAssetUpdateHandler
 	onMessage               MessageHandler
 	onError                 ErrorHandler
 	txClient                *TxClient // For generating auth tokens
@@ -406,7 +407,7 @@ func (c *WsAccountMarketClient) handleSubscribedAccountMarket(message []byte) {
 // handleUpdateAccountMarket handles account market update messages
 func (c *WsAccountMarketClient) handleUpdateAccountMarket(message []byte) {
 	// Log raw message for debugging
-	log.Printf("AccountMarket raw update message: %s", string(message))
+	// log.Printf("AccountMarket raw update message: %s", string(message))
 
 	var update AccountMarketUpdate
 	if err := json.Unmarshal(message, &update); err != nil {
@@ -428,6 +429,14 @@ func (c *WsAccountMarketClient) handleUpdateAccountMarket(message []byte) {
 	}
 
 	// Call specific handlers based on what data is present
+
+	if len(update.Assets) > 0 && c.onAssetUpdate != nil {
+		assets := make([]Asset, 0)
+		for _, a := range update.Assets {
+			assets = append(assets, a)
+		}
+		c.onAssetUpdate(update.Account, assets)
+	}
 
 	// Handle order updates - check if orders array has content
 	if len(update.Orders) > 0 && c.onOrderUpdate != nil {
