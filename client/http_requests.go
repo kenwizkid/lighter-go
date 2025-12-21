@@ -304,9 +304,9 @@ type AccountInfo struct {
 }
 
 type AssetInfo struct {
-	Symbol      string `json:"symbol"`
-	AssetId     string `json:"asset_id"`
-	Balance     string `json:"balance"`
+	Symbol        string `json:"symbol"`
+	AssetId       string `json:"asset_id"`
+	Balance       string `json:"balance"`
 	LockedBalance string `json:"locked_balance"`
 }
 
