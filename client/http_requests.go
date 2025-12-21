@@ -300,6 +300,14 @@ type AccountInfo struct {
 	CrossAssetValue         string         `json:"cross_asset_value"`
 	Positions               []PositionInfo `json:"positions"`
 	Orders                  []OrderInfo    `json:"orders"`
+	Assets                  []AssetInfo    `json:"assets"`
+}
+
+type AssetInfo struct {
+	Symbol      string `json:"symbol"`
+	AssetId     string `json:"asset_id"`
+	Balance     string `json:"balance"`
+	LockedBalance string `json:"locked_balance"`
 }
 
 // PositionInfo represents position information
