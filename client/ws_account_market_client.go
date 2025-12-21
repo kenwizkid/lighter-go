@@ -146,6 +146,13 @@ func WithAccountMarketFundingUpdateHandler(handler AccountMarketFundingUpdateHan
 	}
 }
 
+// WithAccountAssetUpdateHandler sets the asset update handler
+func WithAccountAssetUpdateHandler(handler AccountAssetUpdateHandler) WsAccountMarketClientOption {
+	return func(c *WsAccountMarketClient) {
+		c.onAssetUpdate = handler
+	}
+}
+
 // WithAccountMarketLocalIP sets the local IP address for outgoing connections
 func WithAccountMarketLocalIP(localIP string) WsAccountMarketClientOption {
 	return func(c *WsAccountMarketClient) {
