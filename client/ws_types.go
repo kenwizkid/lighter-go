@@ -184,6 +184,12 @@ type Trade struct {
 	Type                             string      `json:"type"`
 	UsdAmount                        json.Number `json:"usd_amount"`
 }
+type Asset struct {
+	Symbol        string `json:"symbol"`
+	AssetId       int    `json:"asset_id"`
+	Balance       string `json:"balance"`
+	LockedBalance string `json:"locked_balance"`
+}
 
 // AccountMarketUpdate represents an account market update message (matches API docs)
 type AccountMarketUpdate struct {
@@ -193,6 +199,7 @@ type AccountMarketUpdate struct {
 	FundingHistory []FundingHistory       `json:"funding_history,omitempty"`
 	Orders         []AccountMarketOrder   `json:"orders"`
 	Position       *AccountMarketPosition `json:"position,omitempty"`
+	Assets         []Asset                `json:"assets,omitempty"`
 	Trades         []Trade                `json:"trades"`
 }
 
